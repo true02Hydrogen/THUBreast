@@ -31,7 +31,6 @@ classdef voxelize < handle
         end
 
         function  [Nx,Ny,Nz] = dim(obj)
-            %体模数组的尺寸，创建体模数组
             Nx=floor((obj.Xupper-obj.Xlower)*obj.Res);
             Ny=floor((obj.Yupper-obj.Ylower)*obj.Res);
             Nz=floor((obj.Zupper-obj.Zlower)*obj.Res);
@@ -39,7 +38,7 @@ classdef voxelize < handle
         end
 
         function  X = x2X(obj,x)
-            X=x/obj.Res+obj.Xlower; %X为位置坐标，x为体素坐标
+            X=x/obj.Res+obj.Xlower; % X is the position coordinate, x is the voxel coordinate
         end
 
         function  x = X2x(obj,X)

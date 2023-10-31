@@ -18,14 +18,11 @@ c = 30;
 for i = 1:numP
     Pi = P(i,:); ai = a(i); bi = b(i) ; ci = c;
     X0 = Pi(1); Y0 = Pi(2); Z0 = Pi(3);
-    %椭球的判断范围（正方体）边界对应的体素编号值
     [xBoxLow,xBoxUp,yBoxLow,yBoxUp,zBoxLow,zBoxUp] = obj.Box(Pi,c);
-    % 椭球中心对应的体素值
     [x0,y0,z0] = obj.XYZ2xyz(X0,Y0,Z0);
     [beta,psi,~] = cart2sph(direc(1)-X0,direc(2)-Y0,direc(3)-Z0);
     psi  = pi/2 -psi;
     beta = pi/2 -beta;
-    % (x,y,z)为判定范围内所有点的体素坐标,(xt,yt,zt)是其在局部坐标系下的体素坐标。
     [y,x,z] = meshgrid(yBoxLow:yBoxUp, xBoxLow:xBoxUp, zBoxLow:zBoxUp);
     xt = -cos(psi)*sin(beta)*(x-x0)-cos(psi)*cos(beta)*(y-y0)+sin(psi)*(z-z0);
     yt =           cos(beta)*(x-x0)-         sin(beta)*(y-y0)                ;
@@ -54,24 +51,16 @@ bool_mat = bool_mat&bool_adip;
 end
 
 function cooperCenter = CooperSample(obj,bool_adip)
-% CooperSample:在乳房前侧皮下脂肪区域抽取中心点用于体素化cooper韧带
-% Input:
-%   obj 为实例化voxelize()
-%   bool_brfatf 乳房前侧皮下脂肪区域 逻辑矩阵
-% Output：
-%   cooperCenter:抽取的所有椭球中心坐标
-% written by Renli; modified by Wangjiahao
 
-reserved = 4000;%从bool_brfatb逻辑矩阵(前表面)处随机取出reserved个点
+reserved = 4000;
 nTotal = find(bool_adip);
-RndInd = randi(length(nTotal),[reserved,1]); %随机产生reserved个索引号
+RndInd = randi(length(nTotal),[reserved,1]);
 [px,py,pz] = ind2sub(size(bool_adip),nTotal(RndInd));
 [PX,PY,PZ] = obj.xyz2XYZ(px,py,pz);
-%==================去掉中心距离小于26的点==================
 P = NaN(reserved,3);
-P(1,:) = [PX(1),PY(1),PZ(1)]; %用来存储相互距离大于26的点
-counter = 1; %记录有多少个有效的Cooper中心点
-tag = 1;%判断距离标识如果存在距离小于26的点，则置为0.
+P(1,:) = [PX(1),PY(1),PZ(1)]; 
+counter = 1;
+tag = 1;
 for i=2:reserved
     tempP=[PX(i),PY(i),PZ(i)];
     for j=1:counter
@@ -87,7 +76,7 @@ for i=2:reserved
        tag = 1;
     end
 end
-nEffect = length(find(~isnan(P)))/3; %Pcpr中有效的点个数
+nEffect = length(find(~isnan(P)))/3; 
 cooperCenter = P(1:nEffect,:);
 end
 

@@ -21,13 +21,11 @@ if X2<=v.Xlower||X2>v.Xupper||Y2<=v.Ylower||Y2>v.Yupper ...
     disp("cylinder beyond the voxel matrix boundary");
     return
 else         
-    [x1,y1,z1] = v.XYZ2xyz(X1,Y1,Z1); %P1点对应的体素值
+    [x1,y1,z1] = v.XYZ2xyz(X1,Y1,Z1);
 
     [beta,psi,h] = cart2sph(X2-X1,Y2-Y1,Z2-Z1);
     psi  = pi/2 -psi;
     beta = pi/2 -beta;
-    %在这里计算beta psi均是计算实际坐标的beta psi 
-    %坐标变换时使用的是体素坐标，所以角度不一样
 
     [xBoxLow,xBoxUp,yBoxLow,yBoxUp,zBoxLow,zBoxUp] = BoxCylinder(v,P1,P2,R);
     box = [xBoxLow,xBoxUp,yBoxLow,yBoxUp,zBoxLow,zBoxUp];
