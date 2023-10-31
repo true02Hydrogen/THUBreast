@@ -12,4 +12,4 @@ addpath(fullfile(root, 'perlin'));
 addpath(fullfile(root, 'bct'));
 % addpath(fullfile(root, 'toGraff'));
 
-fprintf('breastPhantom v2.0 is ready\n')
+fprintf('THUBreast is ready!\n')
