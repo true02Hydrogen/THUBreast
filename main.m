@@ -96,7 +96,7 @@ disp([num2str(toc,formatSpec),'s  ->','duct tree and TDLU voxelize... ']);
 disp([num2str(toc,formatSpec),'s  ->','ampulla voxelize... ']);
 breast = ductBranch.creAmpul(v,breast,nippleRad,nippleP);
 
-save breast1.mat
+% save breast1.mat
 %%
 % adipose ellip voxelize
 disp([num2str(toc,formatSpec),'s  ->','adipose ellip voxelize... ']);
@@ -106,7 +106,7 @@ targetGlaFrac = bas.targetGlaFrac; % target glandularity
 time = regexprep(mat2str(clock),'[. []]','');
 filename = [bas.outputDir,num2str(targetGlaFrac),'_',time,'.mat'];
 save(filename,'breast','dTree','actualGlaFrac');
-disp(['glandularity:100->',num2str(targetGlaFrac),'running time: ',num2str(toc,formatSpec),'s']);
+disp(['glandularity(VBD) ->',num2str(targetGlaFrac),'running time: ',num2str(toc,formatSpec),'s']);
 disp(' Congratulations!!! breastPhantom Generate Successfully !!!');
 
 
