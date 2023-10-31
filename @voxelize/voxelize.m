@@ -38,7 +38,8 @@ classdef voxelize < handle
         end
 
         function  X = x2X(obj,x)
-            X=x/obj.Res+obj.Xlower; % X is the position coordinate, x is the voxel coordinate
+            X=x/obj.Res+obj.Xlower; 
+            % X is the position coordinate, x is the voxel coordinate
         end
 
         function  x = X2x(obj,X)

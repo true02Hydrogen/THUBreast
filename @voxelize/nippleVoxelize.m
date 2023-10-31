@@ -1,5 +1,4 @@
 function bool_mat = nippleVoxelize(obj,nippleP,nippleRad,nippleLen)
-
 t = 3;
 [Nx,Ny,Nz] = obj.dim;
 bool_mat = zeros(Nx,Ny,Nz,'logical');

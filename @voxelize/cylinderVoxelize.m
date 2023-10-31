@@ -48,7 +48,7 @@ function [xBoxLow,xBoxUp,yBoxLow,yBoxUp,zBoxLow,zBoxUp] = BoxCylinder(obj,P1,P2,
 %   R:   the radius of cylinder
 % Output：
 %   [xBoxLow,xBoxUp,yBoxLow,yBoxUp,zBoxLow,zBoxUp]: xyz range of logical area
-% written by Wangjiahao
+% written by Wangjiahao.
 [Nx,Ny,Nz] = obj.dim;
 
 xmin = min(P1(1),P2(1));  ymin = min(P1(2),P2(2));  zmin = min(P1(3),P2(3));

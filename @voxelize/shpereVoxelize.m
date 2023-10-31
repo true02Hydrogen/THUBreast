@@ -8,7 +8,7 @@ function [bool_mat,box] = shpereVoxelize(obj,P,R)
 %   R   : radius of sphere
 % Output：
 %   bool_mat : The logical matrix of the voxelized target region
-% written by Wangjiahao
+% written by Wangjiahao.
 
 X0 = P(1); Y0 = P(2); Z0 = P(3);
 % The sphere determines the voxel number value corresponding to the range boundary

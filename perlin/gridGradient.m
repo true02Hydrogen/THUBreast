@@ -7,7 +7,7 @@ function [n00,n10,n01,n11] = gridGradient(x,y,uxmat,uymat)
 %   uymat   The extracted fixed grid point gradient vector y value
 % Output：
 %   [n00,n10,n01,n11]: For each x,y value corresponds to the grid point weight
-% written by Wangjiahao
+% written by Wangjiahao.
 
 [r,~] = size(uxmat);
 

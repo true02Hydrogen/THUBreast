@@ -14,11 +14,8 @@ P = AdipSample(obj,bool_adip,nAdip);
 for i = 1:size(P,1)
     Pi = P(i,:);
     X0 = Pi(1); Y0 = Pi(2); Z0 = Pi(3);
-    %球判断范围边界对应的体素编号值
     [xBoxLow,xBoxUp,yBoxLow,yBoxUp,zBoxLow,zBoxUp] = Box(obj,Pi,R);
-    % 球心点对应的体素值
     [x0,y0,z0]=XYZ2xyz(obj,X0,Y0,Z0);
-    % （x,y,z）为体素模型下的所有序号坐标
     [y,x,z] = meshgrid(yBoxLow:yBoxUp, xBoxLow:xBoxUp, zBoxLow:zBoxUp);
     x = x-x0;  y = y-y0;  z = z-z0;
     [phi,theta,r] = cart2sph(x,y,z);

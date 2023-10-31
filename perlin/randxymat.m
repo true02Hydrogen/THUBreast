@@ -2,7 +2,7 @@ function [uxmat,uymat] = randxymat(numx,numy)
 num = numx*numy;
 uxmat = zeros(numy,numx);
 uymat = zeros(numy,numx);
-
+% normalize to 0-1;
 for j = 1:num
     k = 0;
     while k==0

@@ -6,7 +6,7 @@ function bool_mat = cooperVoxelize(obj,bool_adip,direc)
 %   direc: the direction of an ellipsoid 
 % Output：
 %   bool_mat: Cooper logical area sampled , Nx*Ny*Nz
-% written by Renli; modified by Wangjiahao
+% written by Renli; modified by Wangjiahao.
 
 [Nx,Ny,Nz] = obj.dim;
 bool_mat = zeros(Nx,Ny,Nz,'logical');
