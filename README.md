@@ -14,7 +14,8 @@ The procedure for configuring the environment is as follows: Install the environ
 <li>View it in the App using the 3D volume viewer.</li>
 </ul>
 
+
 <h2>Input file</h2>
-<p>You can refer to Input file in the arg folder for a b c d cup breas, and you can modify the voulumetric glandular fraction (VGF) and voxel size (voxSize) in the main program.</p>
+<p>You can refer to Input file in the arg folder for a b c d cup breas, and you can modify the volumetric glandular fraction (VGF) and voxel size (voxSize) in the main program.</p>
 
 
