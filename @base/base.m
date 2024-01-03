@@ -25,10 +25,10 @@ classdef base < handle
         function obj = base(targetGlaFrac,skinThick,nippleLen,nippleRad,...
                 areolaRad,muscThick,leftBreast,outputDir)
             if nargin == 0
-                disp("<base>: Use default parameters, set glandularity as 50%");
+                disp("<base>: Use default parameters, set VGF(volume glandular fraction) as 50%");
             elseif nargin == 1
                 obj.targetGlaFrac = targetGlaFrac;
-                disp(['<base>: Use default parameters, set glandularity as ',...
+                disp(['<base>: Use default parameters, set VGF(volume glandular fraction) as ',...
                     num2str(targetGlaFrac),'%']);
             elseif nargin == 2
                 obj.targetGlaFrac = targetGlaFrac;
@@ -54,11 +54,11 @@ classdef base < handle
             adipSamThick = obj.adipnThick/2;
         end
 
-        bool_skin = creSkin(obj,v,bool_surf,bool_musc,bool_nipple,nippleP);
+        bool_skin = creSkin(obj,v,bool_surf,bool_nipple,nippleP);
         % create skin logical area
         [bool_fAdip,bool_bAdip,bool_fibGla] = creSubAdip(obj,v,bool_surf,nippleP,adipShRad);
         % create ventral(front) adipose logical area/ postero-lateral(back) adipose logical area
-        % fiberglandular logical area
+
     end
 
     methods(Static)

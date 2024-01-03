@@ -1,16 +1,13 @@
-function [surfVert,surfFace,muscVert,muscFaces] = shapePly(obj,muscThick,leftBreast)
+function [surfVert,surfFace] = shapePly(obj,leftBreast)
 % shapePly: obtain the breast surface shape and muscle shape
 %           consisting of triangles and vertices
 % Input:
 %   obj: instantiation of Class:shape
-%   muscThick: the thickness of muscle
 %   leftBreast: left breast or right breast
 % Output：
 %   surfVert: the vertices of breast surface shape; 
 %             the final point is the position of nipple; 
 %   surfFace: the faces of breast surface shape
-%   muscVert: the vertices of muscle shape
-%   muscFaces: the faces of muscle shape
 % written by Wangjiahao
 
 %% shape parameter
@@ -34,11 +31,15 @@ g0 = obj.flattenSideG0;
 g1 = obj.flattenSideG1;
 h0 = obj.turnTopH0;
 h1 = obj.turnTopH1;
+k0 = obj.corElongK0;
+k1 = obj.corElongK1;
+k2 = obj.corElongK2;
 doTopShape = obj.doTopShape;
 doFlattenSide = obj.doFlattenSide;
 doTurnTop = obj.doTurnTop;
 doPtosis = obj.doPtosis;
 doTurn = obj.doTurn;
+doCoronalElongate = true;
 
 %% breast surface shape triangles and vertices
 % bottom right
@@ -99,25 +100,62 @@ P1 = shape.topshapeDeform(doTopShape,P0,surfAngle,s0,t0,s1,t1);
 P2 = shape.flattensideDeform(doFlattenSide,P1,g0,g1,leftBreast);
 P3 = shape.turntopDeform(doTurnTop,P2,h0,h1,leftBreast);
 P4 = shape.ptosisDeform(doPtosis,P3,b0,b1);
-surfVert = shape.turnDeform(doTurn,P4,c0,c1);
+P5 = shape.turnDeform(doTurn,P4,c0,c1);
+surfVert = shape.coronalElongateDeform(doCoronalElongate,P5,k0,k1,k2);
 
-figure('Color',[1,1,1])
-trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3));
-trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3),'EdgeColor','none');
-% trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3));
+figure
+subplot(1,2,1)
+trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3))
 axis equal
-axis off
 l = light;
 l.Color = [1 1 1];
-l.Position = [200 200 200];
+l.Position = [200 -200 200];
 lighting phong
 material  dull
+view([45 -45 45]);
+axes('position',[0.1  .1  3  3])
+
+
+subplot(2,2,2)
+trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3))
+axis equal
+l = light;
+l.Color = [1 1 1];
+l.Position = [200 -200 200];
+lighting phong
+material  dull
+view([0 0]);
+axes('position',[.1  .1  2  .6])
+
+subplot(2,2,4)
+trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3))
+axis equal
+l = light;
+l.Color = [1 1 1];
+l.Position = [200 0 200];
+lighting phong
+material  dull
+view([90 0]);
+axes('position',[2.1  .1  .8  .6])
+% print('p0','-dpng','-r600');
+
+% figure('Color',[1,1,1])
+% trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3));
+% trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3),'EdgeColor','none');
+% trisurf(surfFace,surfVert(:,1),surfVert(:,2),surfVert(:,3));
+% axis equal
+% axis off
+% l = light;
+% l.Color = [1 1 1];
+% l.Position = [200 0 200];
+% lighting phong
+% material  dull
 
 %% muscle triangles and vertices
-check = (Phi == 0);
-muscPlane1 = surfVert(check,:);
-muscPlane2 = cat(2,muscPlane1(:,1)-muscThick,...
-    muscPlane1(:,2),muscPlane1(:,3));
-muscVert = cat(1,muscPlane1,muscPlane2);
-muscDT = delaunayTriangulation(muscVert);
-[muscFaces,~] = convexHull(muscDT);
+% check = (Phi == 0);
+% muscPlane1 = surfVert(check,:);
+% muscPlane2 = cat(2,muscPlane1(:,1)-muscThick,...
+%     muscPlane1(:,2),muscPlane1(:,3));
+% muscVert = cat(1,muscPlane1,muscPlane2);
+% muscDT = delaunayTriangulation(muscVert);
+% [muscFaces,~] = convexHull(muscDT);

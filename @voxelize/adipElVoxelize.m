@@ -5,14 +5,10 @@ function [breast,actualGlaFrac] = adipElVoxelize(obj,targetGlaFrac,breast,nipple
 %   targetGlaFrac: target glandular fraction range:(0,100]
 %   breast: breast matrix, Nx*Ny*Nz
 %   nippleP: nipple position, [X,Y,Z]
-% Output：
+% Output:
 %   breast: breast matrix, Nx*Ny*Nz
 %   actualGlaFrac: actual glandular fraction
-% written by by Wangjiahao
-
-minArgs=4;
-maxArgs=6;
-narginchk(minArgs,maxArgs);
+% written by Renli; modified by Wangjiahao
 
 t = tissue();
 tempBreast = breast;
@@ -23,12 +19,13 @@ if targetGlaFrac == 100
     return  
 elseif targetGlaFrac <= minGlaFrac
     actualGlaFrac = minGlaFrac;
-    breast = tempBreast;
+    breast = tempBreast; clear tempBreast;
     return
 end
 
 reserved = 100000;
 Vfat = tissue.targetVfat_vbd(obj,breast,targetGlaFrac); %目标vbd下 纤维腺体区其中脂肪体积
+Vfat = Vfat - length(find(breast == t.fgAdip))/(obj.Res)^3;
 if Vfat < 0
     disp(' cannot obtain the target VBD !!!');
     return
@@ -45,20 +42,21 @@ minElNum = find(cumVolumeEl<Vfat, 1, 'last' );% min ellip number
 if isempty(minElNum)
     minElNum = 1; 
 end
-bool_fibGla = (breast == t.fgFiber|breast == t.dTree | breast == t.lob);
+bool_fibGla = (breast == t.fgFiber | breast == t.dTree | breast == t.lob);
 bool_dTree = (breast == t.dTree | breast == t.lob);
 
 % 脂肪球的抽样分布
-bool_samp = ~bool_dTree&bool_fibGla;
-raf_gauss = gauss_RA_dis([size(bool_samp,2),size(bool_samp,3)],targetGlaFrac);
-raf_homo = x_RA_dis([size(bool_samp,2),size(bool_samp,3)],targetGlaFrac);
+bool_samp = ~bool_dTree&bool_fibGla; clear bool_dTree bool_fibGla;
+raf_gauss = gauss_RA_dis([size(bool_samp,2),size(bool_samp,3)],targetGlaFrac,obj.Res);
+raf_homo = x_RA_dis([size(bool_samp,2),size(bool_samp,3)],targetGlaFrac,obj.Res);
 M_sup = max(raf_gauss(:)./raf_homo(:));
 distribution = raf_gauss./raf_homo/M_sup;
 
-bool_mat = zeros(size(breast),'logical');
+bool_mat = breast == t.fgAdip;
 
 P = elAdipSample(obj,bool_samp,reserved);
 direc = nippleP;
+
 if nargin < 6
     gcy = nippleP(2); gcz = nippleP(3);
 end
@@ -70,7 +68,7 @@ for i = 1:reserved
     % 椭球中心对应的体素值
     [x0,y0,z0]=XYZ2xyz(obj,X0,Y0,Z0);
 
-    cdist = max(ceil(norm([y0-gcy,z0-gcz])/5),1);
+    cdist = max(ceil(norm([y0-gcy,z0-gcz])/obj.Res),1);
     if rand > distribution(cdist)
         continue;
     end
@@ -100,17 +98,20 @@ for i = 1:reserved
     yt = rotMat(2,1)*(x-x0)+rotMat(2,2)*(y-y0)+rotMat(2,3)*(z-z0);
     zt = rotMat(3,1)*(x-x0)+rotMat(3,2)*(y-y0)+rotMat(3,3)*(z-z0);
     [phit,thetat,r] = cart2sph(xt/ai,yt/bi,zt/ci);
+    clear x y z xt yt zt;
     
-    freq = 5;
-    [uxmat,uymat] = randxymat(freq+2,freq+2);
-    [uxmat2,uymat2] = randxymat(2*freq+2,2*freq+2); 
+    freq = 5;  weight = 0.5;
     xp = (phit+pi)/(2*pi)*freq;
     kxi = 1/2-cos(thetat+pi/2)/2;
-    yp = (kxi)*freq;
-    zp1=perlinNoise(xp,yp,uxmat,uymat);
-    zp2=perlinNoise(xp*2,yp*2,uxmat2,uymat2);
-    weight = 0.5;
-    zp = zp1 + zp2*weight;
+    yp = (kxi)*freq; clear phit thetat kxi;
+
+    [uxmat,uymat] = randxymat(freq+2,freq+2);
+    zp1=perlinNoise(xp,yp,uxmat,uymat); clear uxmat uymat;
+
+    [uxmat2,uymat2] = randxymat(2*freq+2,2*freq+2); 
+    zp2=perlinNoise(xp*2,yp*2,uxmat2,uymat2); clear xp yp uxmat2 uymat2;
+
+    zp = zp1 + zp2*weight; clear zp1 zp2;
 
     if elCount < minElNum
         bool_mat(xBoxLow:xBoxUp,yBoxLow:yBoxUp,zBoxLow:zBoxUp) = ...
@@ -143,6 +144,7 @@ for i = 1:reserved
             break
         end
     end
+    clear r zp;
 end
 end
 
@@ -156,7 +158,7 @@ end
 
 function y = xgauss(bin)
 % 生成0-1之间的x*Gauss的密度分布，sigma根据Hernandez 2015得到
-sigma = 0.135*2;
+sigma = 0.22*2;
 interval = 1/bin; %bin必须比抽样平面的半维度要大，500比较合适;
 x = interval/2:interval:1-interval/2;
 y = x.*exp(-x.^2/(2*sigma^2));% 此处修改函数可以得到任意函数分布的抽样！
@@ -174,7 +176,7 @@ for i = 1:n
 end
 end
 
-function [raf,raf2] = x_RA_dis(dim,targetGlaFrac)
+function [raf,raf2] = x_RA_dis(dim,targetGlaFrac,Res)
 samp_model = ones([dim(1),dim(2),10],'uint8');
 [y,x,~] = meshgrid(1:dim(2), 1:dim(1), 1:10);
 c = [ceil(dim(1)/2),ceil(dim(2)/2)];
@@ -184,7 +186,7 @@ samp_model = permute(samp_model,[3,1,2]);
 [bool_adipose,bool_glandular] = constructXfgRegionS(bool_inner,targetGlaFrac);
 samp_model(bool_adipose) = 2;
 samp_model(bool_glandular) = 3;
-bin = ceil(min(ceil(dim(1)/2),ceil(dim(2)/2))/5);
+bin = ceil(min(ceil(dim(1)/2),ceil(dim(2)/2))/Res);
 raf = zeros(bin,0);
 for i = 1:10
     raf = cat(2,raf,RAF(squeeze(samp_model(i,:,:)),bin));
@@ -211,7 +213,7 @@ bool_glandular(nTotal(RndInd)) = 1;
 bool_adipose = bool_adipose&~bool_glandular;
 end
 
-function [raf,raf2] = gauss_RA_dis(dim,targetGlaFrac)
+function [raf,raf2] = gauss_RA_dis(dim,targetGlaFrac,Res)
 samp_model = ones([dim(1),dim(2),10],'uint8');
 [y,x,~] = meshgrid(1:dim(2), 1:dim(1), 1:10);
 c = [ceil(dim(1)/2),ceil(dim(2)/2)];
@@ -221,7 +223,7 @@ samp_model = permute(samp_model,[3,1,2]);
 [bool_adipose,bool_glandular] = constructGaussfgRegionS(bool_inner,targetGlaFrac);
 samp_model(bool_adipose) = 2;
 samp_model(bool_glandular) = 3;
-bin = ceil(min(ceil(dim(1)/2),ceil(dim(2)/2))/5);
+bin = ceil(min(ceil(dim(1)/2),ceil(dim(2)/2))/Res);
 raf = zeros(bin,0);
 for i = 1:10
     raf = cat(2,raf,RAF(squeeze(samp_model(i,:,:)),bin));

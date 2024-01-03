@@ -84,10 +84,16 @@ classdef voxelize < handle
         [bool_mat,box] = shpereVoxelize(obj,P,R);
         [breast,actualGlaFrac] = adipElVoxelize(obj,targetGlaFrac,breast,nippleP,gcy,gcz);
 %         bool_cooper = CooperVoxelize2(obj,bool_surf,nippleP,cooperThick);
+        bool_mat = muscleVoxelize(obj,slice,muscThick);
+        bool_mat = virtualAdipVoxelize(obj,slice,virtualAdipThick);
     end
 
-%     methods(Static)
-%         [surfVert,surfFace] = CooperVoxelize2(nippleP);
-%     end
+    methods(Static)
+        % [surfVert,surfFace] = CooperVoxelize2(nippleP);
+        vol = plyVolume(FV); %cm3
+        area = plySkinArea(FV); %cm2
+        vol = volBreast(invol,area,skinThick); %cm2
+    end
+
 end
 

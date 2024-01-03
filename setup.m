@@ -9,6 +9,7 @@ addpath(root);
 
 addpath(fullfile(root, 'arg'));
 addpath(fullfile(root, 'perlin'));
+addpath(fullfile(root, 'func'));
 % addpath(fullfile(root, 'bct'));
 
 fprintf('THUBreast is ready!\n')

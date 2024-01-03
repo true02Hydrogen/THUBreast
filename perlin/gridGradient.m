@@ -1,55 +1,39 @@
 function [n00,n10,n01,n11] = gridGradient(x,y,uxmat,uymat)
-% gridGradient:According to the voxelized coordinate matrix, the weight value of each voxel point corresponding to the surrounding square points is calculated;
+% gridGradient:根据体素化坐标矩阵算出每个体素点对应周围方格点权重值;
 % Input:
-%   x       The theta value of each voxel point of the voxelized cube, a three-dimensional matrix
-%   y       The phi   value of each voxel point of the voxelized cube, a three-dimensional matrix
-%   uxmat   The extracted fixed grid point gradient vector x value
-%   uymat   The extracted fixed grid point gradient vector y value
+%   x       体素化立方体每个体素点的theta值，三维矩阵
+%   y       体素化立方体每个体素点的phi  值，三维矩阵
+%   uxmat   抽取的固定网格点梯度向量x值
+%   uymat   抽取的固定网格点梯度向量y值
 % Output：
-%   [n00,n10,n01,n11]: For each x,y value corresponds to the grid point weight
-% written by Wangjiahao.
+%   [n00,n10,n01,n11]: 对于每个x,y值对应的网格点权重
+% written by Wangjiahao
 
 [r,~] = size(uxmat);
 
-x(x<0) = 0; y(y<0) = 0; %Prevents accuracy problems of PI,1e-7
+x(x<0) = 0; y(y<0) = 0; %由于pi得精度输入得x y有可能略小于0，如1e-7
 
 d00x = x-floor(x);   d00y = y-floor(y);
-d10x = x-floor(x)-1; d10y = y-floor(y);
-d01x = x-floor(x);   d01y = y-floor(y)-1;
-d11x = x-floor(x)-1; d11y = y-floor(y)-1;
-
-ind00 = floor(y)+1 + r*floor(x);      %left upper
-ind10 = floor(y)+1 + r*(floor(x)+1);  %right upper
-ind01 = floor(y)+2 + r*floor(x);      %left down
-ind11 = floor(y)+2 + r*(floor(x)+1);  %right down
-
+ind00 = floor(y)+1 + r*floor(x);      %左上
 r00x  = uxmat(ind00);
-r00y  = uymat(ind00);
+r00y  = uymat(ind00); clear ind00
+n00 = d00x.*r00x + d00y.*r00y; clear d00x r00x d00y r00y
+
+d10x = x-floor(x)-1; d10y = y-floor(y);
+ind10 = floor(y)+1 + r*(floor(x)+1);  %右上
 r10x  = uxmat(ind10);
-r10y  = uymat(ind10);
+r10y  = uymat(ind10); clear ind10
+n10 = d10x.*r10x + d10y.*r10y; clear d10x r10x d10y r10y
+
+d01x = x-floor(x);   d01y = y-floor(y)-1;
+ind01 = floor(y)+2 + r*floor(x);      %左下
 r01x  = uxmat(ind01);
-r01y  = uymat(ind01);
+r01y  = uymat(ind01); clear ind01
+n01 = d01x.*r01x + d01y.*r01y; clear d01x r01x d01y r01y
+
+d11x = x-floor(x)-1; d11y = y-floor(y)-1;
+ind11 = floor(y)+2 + r*(floor(x)+1);  %右下
 r11x  = uxmat(ind11);
-r11y  = uymat(ind11);
-
-% fr_x = floor(x); fr_y = floor(y);
-% for i =1:r
-%     for j = 1:c
-%         for k = 1:n
-%             r00x(i,j,k)  = uxmat(fr_y(i,j,k)+1,fr_x(i,j,k)+1);
-%             r00y(i,j,k)  = uymat(fr_y(i,j,k)+1,fr_x(i,j,k)+1);
-%             r10x(i,j,k)  = uxmat(fr_y(i,j,k)+1,fr_x(i,j,k)+2);
-%             r10y(i,j,k)  = uymat(fr_y(i,j,k)+1,fr_x(i,j,k)+2);
-%             r01x(i,j,k)  = uxmat(fr_y(i,j,k)+2,fr_x(i,j,k)+1);
-%             r01y(i,j,k)  = uymat(fr_y(i,j,k)+2,fr_x(i,j,k)+1);
-%             r11x(i,j,k)  = uxmat(fr_y(i,j,k)+2,fr_x(i,j,k)+2);
-%             r11y(i,j,k)  = uymat(fr_y(i,j,k)+2,fr_x(i,j,k)+2);
-%         end
-%     end
-% end
-
-n00 = d00x.*r00x + d00y.*r00y;
-n10 = d10x.*r10x + d10y.*r10y;
-n01 = d01x.*r01x + d01y.*r01y;
-n11 = d11x.*r11x + d11y.*r11y;
+r11y  = uymat(ind11); clear ind11
+n11 = d11x.*r11x + d11y.*r11y; clear d11x r11x d11y r11y
 

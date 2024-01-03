@@ -1,8 +1,8 @@
-function [uxmat,uymat] = randxymat(numx,numy) 
+function [uxmat,uymat] = randxymat(numx,numy)  %单位圆内随机向量
 num = numx*numy;
 uxmat = zeros(numy,numx);
 uymat = zeros(numy,numx);
-% normalize to 0-1;
+%采用不断生成随机向量，然后检测是否在单位圆内的方法。这个方法维度越高效率越低。
 for j = 1:num
     k = 0;
     while k==0
@@ -15,7 +15,7 @@ for j = 1:num
     end
 end
 
-uxmat=(uxmat-0.5)*2;
+uxmat=(uxmat-0.5)*2;%把随机向量调整为[-1,1]之间。
 uymat=(uymat-0.5)*2;
 
 uxmat([end-1,end],:)=uxmat([1,2],:); uymat([end-1,end],:)=uymat([1,2],:);
