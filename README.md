@@ -16,7 +16,7 @@ The procedure for configuring the environment is as follows: Install the environ
 
 
 <h2>Input file</h2>
-<p>You can refer to Input file in the arg folder for a b c d cup breas, and you can modify the volumetric glandular fraction (VGF) and voxel size (voxSize) in the main program.</p>
+<p>You can refer to Input file in the arg folder for breast with A B C D cup , and you can modify the volumetric glandular fraction (VGF) and voxel size (voxSize) in the main program to obtain the scattered, dense and fatty breasts.</p>
 
 <h2>Contact</h2>
 <p>If you have any question about the running of THUBreast, please contact us: wangjh19@mails.tsinghua.edu.cn</p>
